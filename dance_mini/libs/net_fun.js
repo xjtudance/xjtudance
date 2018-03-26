@@ -1,44 +1,37 @@
 /*******************************************************************************
-基本函数
+网络处理函数
 Version: 0.1 ($Rev: 1 $)
 Website: https://github.com/xjtudance/xjtudance
 Author: Linlin Jia <jajupmochi@gmail.com>
-Updated: 2017-09-08
+Updated: 2017-10-06
 Licensed under The GNU General Public License 3.0
 Redistributions of files must retain the above copyright notice.
 *******************************************************************************/
 
-var net_fun = require('./net_fun.js');
 var app = getApp();
 
 /**
- * 从数据库读取列表信息
+ * request函数封装
  * @param options object 传入参数，json形式的数据，具体项包含：
- *  collection_name string 集合名称
- *  skip integer 跳过的数据数量
- *  limit integer 获取的数据数量
- *  list_order string 获取数据的顺序
- *  query object 查询条件
- *  getValues string 要获取的具体项
- *  extraData array 需要从其他集合获取相关的数据
+ *  url string 请求url在服务器端的相对路径
+ *  data object 传给服务器的数据
+ *  header object 请求头部
+ *  method string 请求方式，默认为POST
  *  success function request返回成功时执行的函数
  *  fail function request返回失败时执行的函数
  *  complete function request完成时执行的函数
  */
-function listData(options) {
+function request(options) {
   if (typeof options !== 'object') {
     var message = '请求传参应为 object 类型，但实际传了 ' + (typeof options) + ' 类型';
     console.log(message);
     // throw new RequestError(constants.ERR_INVALID_PARAMS, message);
   }
 
-  var collection_name = options.collection_name;
-  var skip = options.skip || 0; // 默认不跳过
-  var limit = options.limit || 1; // 默认读取一条信息
-  var list_order = options.list_order || '_id';
-  var query = options.query || {};
-  var getValues = options.getValues || '';
-  var extraData = options.extraData || [];
+  var url = options.url || ''; // 默认为空
+  var data = options.data || {}; // 默认为空
+  var header = options.header || { 'content-type': 'application/json' };
+  var method = options.method || "POST";
   var noop = function noop() { };
   var success = options.success || noop;
   var fail = options.fail || noop;
@@ -48,32 +41,35 @@ function listData(options) {
 //    title: '正在加载，稍等一下下...',
 //    mask: true,
 //  });
-  net_fun.request({
-    url: 'php/wx_listData.php',
-    data: {
-      'collection_name': collection_name,
-      'skip': skip,
-      'limit': limit,
-      'list_order': list_order,
-      'query': query,
-      'getValues': getValues, // 用/号分隔需要获取的value
-      'extraData': extraData,
-    },
+  wx.request({
+    url: app.global_data.server_url + url,
+    data: data,
+    header: header,
+    method: method,
     success: function (res) {
-      console.log(res.data);
+      // console.log(res.data);
       //wx.hideLoading();
-      if (res.data == []) {
+/*      if (!res.header.errMsg || res.header.errMsg != 0) {
+        console.log(res.header.errMsg || 'header中未定义errMsg！请检查服务器端调用的代码。');
         wx.showToast({
-          title: '没有更多了...',
-          duration: 1000
+          title: res.header.errMsg || 'header中未定义errMsg！',
+          image: '../../images/more.png',
+          duration: 1500,
+          mask: false,
         });
-      } else if (limit == 1) {
-        res.data = res.data[0]; // 如果只获取一条信息，则吧这条信息的具体内容从列表中取出来
-      }
+      } else {
+        success(res);
+      }*/
       success(res);
     },
     fail: function (res) {
       //wx.hideLoading();
+      wx.showToast({
+        title: 'oops，加载失败了...',
+        image: '../../images/more.png',
+        duration: 1500,
+        mask: false,
+      });
       fail(res);
     },
     complete: function () {
@@ -84,5 +80,5 @@ function listData(options) {
 }
 
 module.exports = {
-  listData: listData,
+  request: request,
 };

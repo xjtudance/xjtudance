@@ -1,6 +1,6 @@
 <!--dancers.wxml-->
 
-<scroll-view scroll-y="true" class="dancers-area" bindscrolltoupper="upper" upper-threshold="10" lower-threshold="5" bindscrolltolower="lower" scroll-into-view="{{toView}}" scroll-top="{{scrollTop}}">
+<scroll-view scroll-y="true" class="dancers-area" lower-threshold="5" bindscrolltolower="lower" scroll-into-view="{{toView}}" scroll-top="{{scrollTop}}">
   <button class="btn-todances" bindtap="toDanceIntro">了解dance</button>
   <block wx:for="{{dancer_list}}" wx:key="">
     <view class="dancer-item" data-id="{{item._id}}">

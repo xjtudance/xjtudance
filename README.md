@@ -3,6 +3,18 @@
 ## 效果图
 ![Welcome to Dance!](/images/screenshot/welcome_to_dance.jpg "dance版微信小程序报名页")
 ## 更新日志
+### 2017.10.06
+* 安全 增加mongo数据库每日定时自动备份 - Linlin
+* 新增 中秋、国庆节日启动页面 - Linlin
+* 新增 服务器响应小程序发回的header中添加errMsg控制字段 - Linlin
+* 优化 用户提交报到后，提交按钮disabled - Linlin
+* 优化 报到页面增加表单是否已提交判断，防止用户重复点击提交按钮提交重复表单 - Linlin
+* 优化 小程序前端toast显示时长统一为1500ms，mask非必须时皆设置为false - Linlin
+* 优化 创建db类，处理MongoDB相关操作 - Linlin
+* 优化 创建类bmybbs，处理兵马俑bbs相关操作 - Linlin
+* 优化 上传图片失败提醒 - Linlin
+* 修复 兵马俑bbs无法连接时，小程序端无法报到的问题 - Linlin
+* 修复 活动发布页“说点什么吧”项只能填写数字的问题 - Linlin
 ### 2017.09.29
 * 安全 给mongo数据库设置访问权限，建立dance配置文件，添加安全配置说明文档 - Linlin
 ### 2017.09.14

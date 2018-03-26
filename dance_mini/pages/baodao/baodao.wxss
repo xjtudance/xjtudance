@@ -93,6 +93,7 @@
 
 .btn_ok {
   width: 100%;
+  height: 90rpx;
   font: 40rpx/90rpx "microsoft yahei";
   text-align: center;
   border-top: 1px solid #e8e8ea;

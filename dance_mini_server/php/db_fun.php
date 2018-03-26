@@ -32,6 +32,163 @@ class db {
 		$db->authenticate($MongoDBUserName4Wxmini, $MongoDBUserPwd4Wxmini);
 		return $db;
 	}
+	
+	/**
+	* 创建user数据到mongo数据库
+	* @param MongoDB $db 数据库对象
+	* @param array/string $doc_user 用户数据
+	* @param string $time 当前时间
+	* @param boolean $return_json 是否以JSON字符串形式返回数据，为false时返回格式为数组
+	* @return array 完整的用户数据
+	*/
+	function createUser($db, $doc_user, $time, $return_json = true) {
+ 		if (is_string($doc_user)) {
+			$doc_user = json_decode($doc_user, true);
+			$json_err = json_last_error();
+			if ($json_err != JSON_ERROR_NONE) { // 检查json结构
+				return $json_err;
+			}
+		} elseif (!is_array($doc_user)) { // 检查$doc_user是否是数组
+			return '数据类型错误！$doc_user数据类型应为JSON字符串或数组';
+		}
+		
+		include_once('config.php');
+		// 创建user默认值
+		$doc_user_default = array(
+			'id_dance' => '', // dance的id
+			'nickname' => '', // 昵称
+			'password' => '', // 密码
+			'avatar_url' => '', //$avatar_url, // 头像图片url
+			'gender' => '', // 性别
+			'created' => $time, // 账号建立时间
+			'degree' => array(
+				'level' => credit2level($credit), // 等级
+				'credit' => 400, // 首次登录积分
+				'last_attend' => '' // 上次签到时间
+			),
+			'person_info' => array(
+				'eggday' => '', // 生日
+				'grade' => '', // 年级
+				'major' => '', // 专业
+				'hometown' => '', // 家乡
+				'address' => '', // 所在地（经度 + 纬度）
+				'QQ' => '', // QQ号
+				'contact' => '', // 联系方式
+				'height' => '' // 身高
+			),
+			'web' => array(
+				'duration' => 0, // 上站时间/秒
+				'visit_time' => $time, // 本次访问时间
+				'visit_from' => '', // 访问位置
+				'lastvisit' => $time, // 上次访问时间
+				'ip' => '', // 访问使用的ip地址
+				'net_type' => '', // 网络类型
+				'online' => true, // 是否在线
+				'visited' => 1 // 访问次数
+			),
+			'individualized' => array(
+				'status' => '', // 状态
+				'langue' => '', // 语言，使用微信的
+				'contentsize' => 5, // 内容/字体大小 ????????????
+				'frequent' => array(), // 用户常用
+				'notify' => true, // 是否消息提醒
+				'post2bmy' => true // 是否将文章同步到兵马俑
+			),
+			'diaries' => array(
+				'posts' => '', // 发表文章
+				'upup' => array(), // 顶帖文章
+				'favori' => array(), // 收藏文章
+				'viewd' => array(), // 已查看文章
+				'drafts' => array(), // 草稿
+				'list_order' => 'mama' // 排序方式默认为最近一次修改时间
+			),
+			'social' => array(
+				'like' => array(), // ta喜欢的用户
+				'liked' => array(), // 喜欢ta的用户
+				'friends' => array(), // 朋友
+				'blacklist' => array() // 黑名单
+			),
+			'letters' => array(), // 私信
+			'coins' => array(
+				'get' => 0, // 收入
+				'give' => 0, // 支出
+				'cashed' => 0, // 已提现金额
+				'remains' => 0, // 余额
+				'getnum' => 0, // 被打赏次数
+				'givenum' => 0, // 打赏次数
+				'getlist' => array(), // 被打赏记录
+				'givelist' => array() // 打赏记录
+			),
+			'rights' => array(
+				'silenced' => '', // 禁言结束时间，为空时未被禁言
+				'banban' => array(
+					'is' => false, // 是否是斑斑
+					'apply' => '' // 申请帖/申请卸任帖，为''时表示没申请
+				),
+				'wingdance' => array(
+					'is' => false, // 是否是客服人员
+					'apply' => '' // 申请帖/申请卸任帖，为''时表示没申请
+				),
+				'littlesound' => array(
+					'is' => false, // 是否是小音箱
+					'apply' => '' // 申请帖/申请卸任帖，为''时表示没申请
+				)
+			),
+			'bmy' => array(
+				'id' => '', // 兵马俑id
+				'nickname' => '', // 兵马俑昵称
+				'password' => '' // 兵马俑登录密码
+			),
+			'wechat' => array(
+				'openid_mini' => '', // 与dance微信小程序对应的用户openid
+				'id' => '' // 微信id
+			),
+			'dance' => array(
+				'baodao' => '', // 报到时间，为空时未报到
+				'baodao_bmyurl' => '', // 报到对应的兵马俑BBS报到帖
+				'ball_tickets' => array(), // 舞会门票
+				'danceLevel' => '', // 初入dance时的舞蹈水平
+				'knowdancefrom' => '', // 从哪里知道dance????????????????
+				'selfIntro' => '', // 自我介绍
+				'photos' => array() // 照片地址
+			),
+			'activities' => array(
+				'my_acts' => array(), // 发起活动
+				'in_acts' => array() // 参与活动
+			),
+			'feedbacks' => array(), // 反馈
+			'messages' => array() // 消息
+		);
+		$doc_user = self::updateArray($doc_user_default, $doc_user); // 用新数组更新默认值
+		$collection_users = $db->users;
+		$collection_users->insert($doc_user);
+		if ($return_json == true) {
+			$doc_user = json_encode($doc_user);
+		}
+		return $doc_user;
+	}
+	
+	/**
+	* 使用新数组更新原有数组。对于相同键名，如键值非数组，则用新数组键值替换原数组键值；否则递归调用。
+	* @param array $array1 原数组
+	* @param array $array2 新数组
+	* @return array 更新后的数组
+	*/
+	function updateArray(&$array1, &$array2) {
+		static $recursive_counter = 0; // 限制递归调用深度，最多可递归到10层array数据，超过报警
+						echo $recursive_counter;
+		if (++ $recursive_counter > 10) { // 每次递归调用加1
+			return 'possible deep recursion attack!</br>可能受到了深层递归调用攻击！';
+		}
+ 		foreach ($array1 as $key => &$value) {
+			if (is_array($value) && array_key_exists($key, $array2)) {
+				$arrayTemp = self::updateArray($value, $array2[$key]);
+				$array2 = array_replace($array2, array($key => $arrayTemp));
+			}
+		}
+		$recursive_counter --; // 递归返回后减1
+		return array_merge($array1, $array2);
+	}
 }
 
 /**

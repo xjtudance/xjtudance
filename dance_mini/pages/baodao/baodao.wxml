@@ -120,7 +120,7 @@
     </view>
 
     <view class="page-body page-section-gap">
-      <button class="btn_ok" form-type="submit">妥了</button>
+      <button class="btn_ok" form-type="submit" loading="{{btn}}" plain="{{btn_submit.plain}}" disabled="{{btn_submit.disabled}}">妥了</button>
     </view>
   </form>
   

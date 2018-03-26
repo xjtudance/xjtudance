@@ -28,7 +28,7 @@
     </view>
     <text class='text-hint text-huyou' bindtap="toHuyou">忽悠</text>
     <view class='album-container' bindtap="toDancerList">
-      <template is='photo-album' data="{{photo: '../../images/group-photo.jpg'}}"/>
+      <template is='photo-album' data="{{photo: '../../images/group-photo.jpg'}}" />
     </view>
     <text class='text-hint text-dancers' bindtap="toDancerList">舞友</text>
   </view>

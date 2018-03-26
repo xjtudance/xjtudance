@@ -23,7 +23,7 @@
 
       <view class="page-section page-section-gap">
         <label class="title">说点什么吧</label>
-        <input name="comment" type="number" class="input_base input_h30" value="" placeholder="{{comment}}" cursor-spacing="150"></input>
+        <input name="comment" class="input_base input_h30" value="" placeholder="{{comment}}" cursor-spacing="150"></input>
       </view>
 
       <view class="page-section page-section-gap">

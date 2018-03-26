@@ -1,4 +1,13 @@
-// dancers.js
+// pages/dancers/dancers.js
+/*******************************************************************************
+舞友列表页
+Version: 0.1 ($Rev: 2 $)
+Website: https://github.com/xjtudance/xjtudance
+Author: Linlin Jia <jajupmochi@gmail.com>
+Updated: 2017-11-08
+Licensed under The GNU General Public License 3.0
+Redistributions of files must retain the above copyright notice.
+*******************************************************************************/
 var app = getApp();
 
 Page({
@@ -14,15 +23,14 @@ Page({
     imgUrl_girl: '../../images/girl-500.png',
 
     isBanban: app.global_data.userInfo ? app.global_data.userInfo.rights.banban.is : false,
+    isListAll: false,
   },
 
   /**
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-    if (this.data.dancer_list == null) {
-      this.listDancers();
-    }
+    console.log("onload dancers");
     this.userLogin();
   },
 
@@ -30,6 +38,10 @@ Page({
    * 生命周期函数--监听页面初次渲染完成
    */
   onReady: function () {
+    if (this.data.dancer_list == null) {
+      this.listDancers();
+    }
+    console.log("onReady dancers");
 
   },
 
@@ -37,6 +49,7 @@ Page({
    * 生命周期函数--监听页面显示
    */
   onShow: function () {
+    console.log("onshow dancers");
 
   },
 
@@ -58,6 +71,7 @@ Page({
    * 页面相关事件处理函数--监听用户下拉动作
    */
   onPullDownRefresh: function () {
+    console.log("onPullDownRefresh dancers");
 
   },
 
@@ -65,6 +79,7 @@ Page({
    * 页面上拉触底事件的处理函数
    */
   onReachBottom: function () {
+    console.log("onReachBottom dancers");
 
   },
 
@@ -85,10 +100,13 @@ Page({
   },
 
   /**
-   * 下拉刷新函数
+   * 上拉触底函数
    */
   lower: function (e) {
-    this.listDancers();
+    if (!this.data.isListAll) {
+      this.listDancers();
+    }
+    console.log("lower dancers");
   },
 
   /**
@@ -102,6 +120,7 @@ Page({
     });
     wx.login({
       success: function (res) {
+        console.log("login success");
         wx.request({
           url: app.global_data.server_url + 'php/wx_getUser.php',
           data: {
@@ -114,39 +133,44 @@ Page({
           },
           method: "POST",
           success: function (res) {
+            console.log(res.data);
+            console.log("getinfo success");
             wx.hideLoading();
             if (res.data !== null) {
               that.setData({
                 isBanban: res.data.rights.banban.is,
               });
               app.global_data.userInfo = res.data;
+              console.log("in database");
             } else { // 用户不在数据库中
               wx.showToast({
-                title: '奇怪，你不在我们的数据库中...',
+                title: '点击下方报名啦！',
                 image: '../../images/more.png',
-                duration: 2000,
-                mask: true,
+                duration: 1500,
+                mask: false,
               });
             }
           },
           fail: function () {
             wx.hideLoading();
+            console.log("getinfo fail");
             wx.showToast({
               title: 'oops，网络bug了，再试一次吧',
               image: '../../images/more.png',
-              duration: 2000,
-              mask: true,
+              duration: 1500,
+              mask: false,
             });
           }
         });
       },
       fail: function () { // 获取微信code失败
         wx.hideLoading();
+        console.log("login fail");
         wx.showToast({
           title: 'oops，网络bug了，再试一次吧',
           image: '../../images/more.png',
-          duration: 2000,
-          mask: true,
+          duration: 1500,
+          mask: false,
         });
       }
     });
@@ -165,26 +189,26 @@ Page({
    * 跳转到用户页面
    */
   openDancerProfile: function (e) {
-    var _id = e.currentTarget.dataset._id.$id;
+    var _id = e.currentTarget.dataset._id.$oid;
     if (app.global_data.userInfo != null) {
-        if (app.global_data.userInfo.dance.baodao != '') { // 跳转
+      if (app.global_data.userInfo.dance.baodao != '') { // 跳转
         wx.navigateTo({
           url: '../dancerPro/dancerPro?_id=' + _id,
         });
       } else { // 没有报到
         wx.showToast({
-          title: '报到才可查阅哦！',
+          title: '先点击下方报名吧！',
           image: '../../images/more.png',
-          duration: 2000,
-          mask: true,
+          duration: 1500,
+          mask: false,
         });
       }
     } else { // 没有用户信息
       wx.showToast({
-        title: 'oops! 你的信息丢掉了...',
+        title: '先点击下方报名吧！',
         image: '../../images/more.png',
-        duration: 2000,
-        mask: true,
+        duration: 1500,
+        mask: false,
       });
     }
   },
@@ -212,27 +236,35 @@ Page({
       },
       method: "POST",
       success: function (res) {
+        console.log(res.data);
         wx.hideLoading();
-        if (res.data == []) {
+        if (res.data.length == 0) {
+          that.setData({
+            isListAll: true,
+          });
           wx.showToast({
-            title: '这是全部舞友了...',
-            duration: 2000
+            title: '这是全部舞友...',
+            duration: 1500
           });
         }
+        if (that.data.dancer_list) {
+          var aa = that.data.dancer_list;
+          console.log(aa.concat(res.data));
+        }
         that.setData({
-          dancer_list: that.data.dancer_list ? Object.assign(that.data.dancer_list, res.data) : res.data, // 将数据传给全局变量dancer_list
+          dancer_list: that.data.dancer_list ? that.data.dancer_list.concat(res.data) : res.data, // 将数据传给全局变量dancer_list
           dancers_length: that.data.dancers_length + limit,
         });
-        console.log(that.data.dancer_list);
-        app.global_data.dancer_list = that.data.dancer_list;
+        //console.log(that.data.dancer_list);
+        //app.global_data.dancer_list = that.data.dancer_list; // tab页面数据不会被销毁
       },
       fail: function (res) {
         wx.hideLoading();
         wx.showToast({
           title: 'oops，加载失败了...',
           image: '../../images/more.png',
-          duration: 2000,
-          mask: true,
+          duration: 1500,
+          mask: false,
         });
       }
     });
@@ -249,7 +281,7 @@ Page({
           title: 'qq号已复制到手机剪切板',
           icon: 'success',
           duration: 1500,
-          mask: true,
+          mask: false,
         });
       },
       fail: function (res) {
@@ -257,7 +289,7 @@ Page({
           title: 'oops，复制失败了...',
           image: '../../images/more.png',
           duration: 1500,
-          mask: true,
+          mask: false,
         });
       }
     });
@@ -274,7 +306,7 @@ Page({
           title: '微信id已复制到手机剪切板',
           icon: 'success',
           duration: 1500,
-          mask: true,
+          mask: false,
         });
       },
       fail: function (res) {
@@ -282,7 +314,7 @@ Page({
           title: 'oops，复制失败了...',
           image: '../../images/more.png',
           duration: 1500,
-          mask: true,
+          mask: false,
         });
       }
     });

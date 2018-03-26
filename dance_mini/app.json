@@ -1,5 +1,6 @@
 {
   "pages": [
+    "pages/startup/startup",
     "pages/index/index",
     "pages/huyou/list/list",
     "pages/baodao/baodao",
@@ -12,13 +13,13 @@
   "window": {
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#800080",
-    "navigationBarTitleText": "Welcome to Dance!",
+    "navigationBarTitleText": "欢迎来到Dance!",
     "navigationBarTextStyle": "#FFFFFF",
     "enablePullDownRefresh": true
   },
   "networkTimeout": {
-    "request": 10000,
-    "downloadFile": 10000
+    "request": 60000,
+    "downloadFile": 60000
   },
   "debug": false
 }

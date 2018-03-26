@@ -1,13 +1,202 @@
-<?php  
+<?php
 /*******************************************************************************
 兵马俑BBS相关函数
-Version: 0.1 ($Rev: 3 $)
+Version: 0.1 ($Rev: 4 $)
 Website: https://github.com/xjtudance/xjtudance
 Author: Linlin Jia <jajupmochi@gmail.com>
-Updated: 2017-09-16
+Updated: 2017-10-01
 Licensed under The GNU General Public License 3.0
 Redistributions of files must retain the above copyright notice.
 *******************************************************************************/
+
+// helper functions
+// -----------------------------------------------------------------------------
+/**
+* 获取兵马俑BBS类
+*/
+function get_bmybbs() {
+	return new bmybbs;
+}
+
+/**
+* 兵马俑BBS类
+*/
+class bmybbs {
+	
+ 	protected $connectable = false; // 兵马俑bbs是否可连接
+		
+	function __construct() {
+		$this->connectBmy();
+	}
+	
+	/**
+	* 连接兵马俑bbs
+	* @param integer $timeout 连接超时时间
+	* @return boolean 兵马俑bbs是否可连接
+	*/
+	function connectBmy($timeout = 5) {
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_POST, 1);
+		curl_setopt($ch, CURLOPT_HEADER, 0);
+		curl_setopt($ch, CURLOPT_URL, 'http://bbs.xjtu.edu.cn');
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout);
+		curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
+		curl_exec($ch);
+		$httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE); // 返回curl爬取过程中获取的http_code
+		curl_close($ch);
+		$connectable = $httpcode == 0 ? false : true; // http_code为0时说明Unable to access
+		$this->connectable = $connectable;
+		return $connectable;
+	}
+	
+	/**
+	* 登录兵马俑账户
+	* @param MongoDB $db 数据库
+	* @param MongoId $user_id 用户id
+	* @param string $bmy_id 用户兵马俑id
+	* @param string $bmy_password 用户兵马俑登录密码
+	* @return string sessionurl
+	* @note 参考bmy_wap的loginindex.php
+	*/
+	function login($db, $user_id, $bmy_id, $bmy_password) {
+		include_once('config.php');
+ 		date_default_timezone_set("Asia/Shanghai");
+		
+		// 从数据库读取兵马俑sessionurl
+		$collection_users = $db->users;
+		$bmysession = $collection_users->findOne(array('_id' => $user_id), array('bmy' => true));
+		if ($bmysession['bmy']['sessionurl'] && time() - $bmysession['bmy']['sessiontime'] < 2592000) {
+			return $bmysession['bmy']['sessionurl'];
+		} else {
+			// 获取当前时间
+			$sec = explode(' ', microtime());
+			$micro = explode('.', $sec[0]);
+			$time = $sec[1].substr($micro[1], 0, 3);
+			
+			// 通过bmy的proxy_url获取sessionurl
+			$proxy_url = "http://bbs.xjtu.edu.cn/BMY/bbslogin?ipmask=8&t={$time}&id={$bmy_id}&pw={$bmy_password}";
+			$result = file_get_html($proxy_url);
+				
+			if(strstr($result, iconv("UTF-8", "GB2312//IGNORE", "错误! 密码错误!")) || strstr($result, iconv("UTF-8", "GB2312//IGNORE", "错误! 错误的使用者帐号!"))) {
+				return array('msg' => '错误! 账号或密码错误!');
+			} else {
+				if(strstr($result, iconv("UTF-8", "GB2312//IGNORE", "错误! 两次登录间隔过密!!"))) {
+					return array('msg' => '错误! 两次登录间隔过密!');
+				} else { // 成功登录
+ 					$sessionurl_t = myfind($result, "url=/", "/", 0);
+					$sessionurl = $sessionurl_t[0];
+					$collection_users->update(array('_id' => $user_id), array('$set' => 
+						array('bmy.id' => $bmy_id, 'bmy.password' => $bmy_password, 
+						'bmy.sessionurl' => $sessionurl, 'bmy.sessiontime' => time())), array('multiple' => true));
+					return $sessionurl;			
+				}
+			}
+		}
+	}
+	
+	/**
+	* 发表文章到兵马俑。
+	* @param string $sessionurl 用户的sessionurl
+	* @param string $title 文章标题
+	* @param string $content 文章内容
+	* @return array 发文返回信息
+	*/
+	function postArticle($sessionurl, $title, $content) {
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_POST, 1);
+		curl_setopt($ch, CURLOPT_HEADER, 0);
+curl_setopt($ch, CURLOPT_URL, 'http://www.baidu.com/');
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+if (curl_exec($ch) == false) {
+			echo 'false';
+		} else {
+			echo 'true';
+		}
+		$result = curl_exec($ch);
+		echo curl_error($ch);
+curl_close($ch);
+
+				echo $result;
+				return;
+
+		$postdata = "title=".urlencode(iconv("UTF-8", "GB18030//IGNORE", $title))."&text=".urlencode(iconv("UTF-8", "GB18030//IGNORE", $content));
+		$url = "http://bbs.xjtu.edu.cn/".$sessionurl."/bbssnd?board=dance&th=-1&signature=1";
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_POST, 1);
+		curl_setopt($ch, CURLOPT_HEADER, 0);
+		curl_setopt($ch, CURLOPT_URL, $url);    
+		curl_setopt($ch, CURLOPT_POSTFIELDS, $postdata);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); 
+		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+		curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+$data = curl_exec($ch);
+$httpcode = curl_getinfo($ch);
+curl_close($ch);
+				echo json_encode($httpcode);
+				return;
+
+
+		curl_close($ch);
+				echo $httpcode;
+				return;
+		var_dump($output);
+		return;
+/* 		if (curl_exec($ch) == true) {
+			echo 'true';
+		} else {
+			echo 'false';
+		}
+		return;
+		echo 'haha';
+		curl_exec($ch);
+		echo curl_error($ch);
+		return;
+		return curl_error($ch);
+		if (!$result = curl_exec($ch)) {
+			return curl_error($ch);
+		}
+		return 'haha';
+		curl_close($ch);
+		return $result; */
+		
+		if(strstr($result, iconv("UTF-8", "GB2312//IGNORE", "错误! 两次发文间隔过密, 请休息几秒后再试!"))) {
+			return '错误! 两次发文间隔过密, 请休息几秒后再试!';
+		} else {
+			return '发文成功！';
+		}
+	}
+	
+	/**
+	* 获取用户最近发表文章的bmyurl
+	* @param string $sessionurl 用户的sessionurl
+	* @param string $bmy_id 用户兵马俑id
+	* @return string bmyurl
+	*/
+	function getLatestArticleUrl($sessionurl, $bmy_id) {
+		$bmyurl = '';
+		$proxy_url = "http://bbs.xjtu.edu.cn/".$sessionurl."/home?B=dance&S=";
+		$result = file_get_html($proxy_url);
+		$user_list = $result->find('td[class=tduser] a');
+		$article_list = $result->find('.tdborder a');
+		for ($offset = 19; $offset >= 0; $offset--) {
+			if ($user_list[$offset]->innertext == $bmy_id) { // 寻找该作者最近发布的文章
+				$article_f = myfind(substr($article_list[$offset]->href, 3), "?B=dance&F=", "&N=", 0);
+				$bmyurl = $article_f[0];
+				break;
+			}
+		}
+		return $bmyurl;
+	}
+	
+	// 类属性get和set函数
+	// -----------------------------------------------------------------------------
+ 	function getConnectable() {
+		return $this->connectable;
+	}	
+}
 
 /**
 * 返回微信小程序报到内容。

@@ -52,29 +52,12 @@ $proxy_url = "http://bbs.xjtu.edu.cn/BMY/bbslogin?ipmask=8&t={$timeBmy}&id={$bmy
 $result = file_get_html($proxy_url);
 $sessionurl_t = myfind($result, "url=/", "/", 0); // 通过bmy的proxy_url获取sessionurl
 $_SESSION["sessionurl"] = $sessionurl_t[0];
-$postdata = "title=".urlencode(iconv("UTF-8", "GB18030//IGNORE", $bmy_title))."&text=".urlencode(iconv("UTF-8", "GB18030//IGNORE", $bmy_content));
-$url = "http://bbs.xjtu.edu.cn/".$_SESSION["sessionurl"]."/bbssnd?board=dance&th=-1&signature=1";
-$ch = curl_init();
-curl_setopt($ch, CURLOPT_POST, 1);
-curl_setopt($ch, CURLOPT_HEADER, 0);
-curl_setopt($ch, CURLOPT_URL, $url);    
-curl_setopt($ch, CURLOPT_POSTFIELDS, $postdata);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); 
-$result = curl_exec($ch);
-curl_close($ch);
 
-$bmyurl = "";  // 获取该文的bmyurl
-$proxy_url = "http://bbs.xjtu.edu.cn/".$_SESSION["sessionurl"]."/home?B=dance&S=";
-$result = file_get_html($proxy_url);
-$user_list = $result->find('td[class=tduser] a');
-$article_list = $result->find('.tdborder a');
-for ($offset = 19; $offset >= 0; $offset--) {
-	if ($user_list[$offset]->innertext == $bmy_id) { // 寻找该作者最近发布的文章
-		$article_f = myfind(substr($article_list[$offset]->href, 3), "?B=dance&F=", "&N=", 0);
-		$bmyurl = $article_f[0];
-		break;
-	}
+if (bmybbs::postArticle($_SESSION["sessionurl"], $bmy_title, $bmy_content) == '错误! 两次发文间隔过密, 请休息几秒后再试!') { // 发表文章
+	echo array('errMsg' => '错误! 两次发文间隔过密, 请休息几秒后再试!');
+	return;
 }
+$bmyurl = bmybbs::getLatestArticleUrl($_SESSION["sessionurl"], $bmy_id); // 获取该文的bmyurl
 
 // 保存数据到数据库
 $collection_diaries = $db->diaries;
@@ -82,89 +65,22 @@ if ($user_info == null) {
 	// user数据	
 	$diary_posts = array();
  	$doc_user = array(
-		"id_dance" => "", // dance的id
 		"nickname" => $_POST['nickname'], // 昵称
-		"password" => "", // 密码
-		"avatar_url" => "", //$avatar_url, // 头像图片url，使用微信的??????????????????????
 		"gender" => $_POST['gender'], // 性别
-		"created" => $time, // 账号建立时间
-		"degree" => array(
-			"level" => credit2level($credit), // 等级
-			"credit" => $credit, // 首次登录积分
-			"last_attend" => "" // 上次签到时间
-		),
 		"person_info" => array(
 			"eggday" => $_POST['eggday'], // 生日
 			"grade" => $_POST['grade'], // 年级
 			"major" => $_POST['major'], // 专业
 			"hometown" => $_POST['hometown'], // 家乡
-			"address" => "", // 所在地（经度 + 纬度）?????????????????????????????
 			"QQ" => $_POST['QQ'], // QQ号
 			"contact" => $_POST['contact'], // 联系方式
 			"height" => $_POST['height'] // 身高
 		),
 		"web" => array(
-			"duration" => 0, // 上站时间/秒
-			"visit_time" => $time, // 本次访问时间
-			"visit_from" => "wxmini", // 访问位置
-			"lastvisit" => $time, // 上次访问时间
-			"ip" => "", // 访问使用的ip地址 ??????????????
-			"net_type" => "", // 网络类型
-			"online" => true, // 是否在线
-			"visited" => 1 // 访问次数
-		),
-		"individualized" => array(
-			"status" => "", // 状态 ?????????????????
-			"langue" => "", // 语言，使用微信的
-			"contentsize" => 5, // 内容/字体大小 ????????????
-			"frequent" => array(), // 用户常用
-			"notify" => true, // 是否消息提醒
-			"post2bmy" => true // 是否将文章同步到兵马俑
+			"visit_from" => "wxmini" // 访问位置
 		),
 		"diaries" => array(
 			"posts" => $diary_posts, // 发表文章
-			"upup" => array(), // 顶帖文章
-			"favori" => array(), // 收藏文章
-			"viewd" => array(), // 已查看文章
-			"drafts" => array(), // 草稿
-			"list_order" => "mama" // 排序方式默认为最近一次修改时间
-		),
-		"social" => array(
-			"like" => array(), // ta喜欢的用户
-			"liked" => array(), // 喜欢ta的用户
-			"friends" => array(), // 朋友
-			"blacklist" => array() // 黑名单
-		),
-		"letters" => array(), // 私信
-		"coins" => array(
-			"get" => 0, // 收入
-			"give" => 0, // 支出
-			"cashed" => 0, // 已提现金额
-			"remains" => 0, // 余额
-			"getnum" => 0, // 被打赏次数
-			"givenum" => 0, // 打赏次数
-			"getlist" => array(), // 被打赏记录
-			"givelist" => array() // 打赏记录
-		),
-		"rights" => array(
-			"silenced" => "", // 禁言结束时间，为空时未被禁言
-			"banban" => array(
-				"is" => false, // 是否是斑斑
-				"apply" => "" // 申请帖/申请卸任帖，为""时表示没申请
-			),
-			"wingdance" => array(
-				"is" => false, // 是否是客服人员
-				"apply" => "" // 申请帖/申请卸任帖，为""时表示没申请
-			),
-			"littlesound" => array(
-				"is" => false, // 是否是小音箱
-				"apply" => "" // 申请帖/申请卸任帖，为""时表示没申请
-			)
-		),
-		"bmy" => array(
-			"id" => "", // 兵马俑id
-			"nickname" => "", // 兵马俑昵称
-			"password" => "" // 兵马俑登录密码
 		),
 		"wechat" => array(
 			"openid_mini" => $str['openid'], // 与dance微信小程序对应的用户openid
@@ -173,20 +89,13 @@ if ($user_info == null) {
 		"dance" => array(
 			"baodao" => $time, // 报到时间，为空时未报到
 			"baodao_bmyurl" => $bmyurl, // 报到对应的兵马俑BBS报到帖
-			"ball_tickets" => array(), // 舞会门票
 			"danceLevel" => $_POST['danceLevel'], // 初入dance时的舞蹈水平
 			"knowdancefrom" => $_POST['knowdancefrom'], // 从哪里知道dance????????????????
 			"selfIntro" => $_POST['selfIntro'], // 自我介绍
 			"photos" => array($photo_path) // 照片地址
-		),
-		"activities" => array(
-			"my_acts" => array(), // 发起活动
-			"in_acts" => array() // 参与活动
-		),
-		"feedbacks" => array(), // 反馈
-		"messages" => array() // 消息
+		)
 	);
-	$collection_users->insert($doc_user);
+	$doc_user = db::createUser($db, $user_info, $time, false);
 	$user_id = $doc_user['_id']; // 用户_id
 } else {
 	// 删除上次报到的信息
