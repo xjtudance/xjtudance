@@ -12,7 +12,7 @@ Redistributions of files must retain the above copyright notice.
 include_once('config.php');
 
 // 获取用户微信openid
-$db = db::getMongoDB();
+/* $db = db::getMongoDB();
 $collection_global = $db->globaldata;
 $contents = $collection_global->findOne(array('name' => 'wxmini'), array('appid' => true, 'secret' => true));
 $appid = $contents["appid"];
@@ -157,7 +157,7 @@ $baodaoY = date('Y')."年的舞会忽悠";
 							$bmy_title => $diary_id)));
 			}  */
 $collection_global->update(array('name' => 'dance'), array('$set' => 
-	array('activities' => $activities)));
+	array('activities' => $activities))); */
 
 // 返回活动提醒给版务
 /* $banbans = $collection_users->find(array('rights.banban.is' => true), array('_id' => true, 'messages' => true));
@@ -191,5 +191,5 @@ foreach ($banbans as $banban) {
 } */
 
 // 返回activities数据
-echo json_encode($doc_activity);
+/* echo json_encode($doc_activity); */
 ?>

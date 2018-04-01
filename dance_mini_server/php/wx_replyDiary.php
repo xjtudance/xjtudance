@@ -13,7 +13,7 @@ Redistributions of files must retain the above copyright notice.
 include_once('config.php');
 
 // 从小程序端获取数据
-$data = file_get_contents('php://input');
+/* $data = file_get_contents('php://input');
 $data = json_decode($data, true);
 $author = $data['author'];
 
@@ -108,11 +108,10 @@ $collection_global = $db->globaldata;
 $collection_global->update(array("name" => "dance"), array('$set' => 
 	array("diary_num" => $diary_num)));
 
-echo 'hahahahah';
-
 $author = $collection_users->findOne(array('_id' => new MongoId($author)), 
 	array('_id' => true, 'id_dance' => true, 'nickname' => true, 'avatar_url' => true, 'degree' => true));
 $doc_diary['author'] = $author;
+header('errMsg: 0');
 echo json_encode(array($doc_diary)); // 将数据放到一个数组对象里便于小程序端拼接
-
+ */
 ?>

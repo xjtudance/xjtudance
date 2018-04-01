@@ -9,10 +9,13 @@ Licensed under The GNU General Public License 3.0
 Redistributions of files must retain the above copyright notice.
 *******************************************************************************/
 
-$dance_release = true; // 是否为发布版本
+class globalVariables {
+	static $dance_release = true; // 是否为发布版本
 
-$dance_db = "xjtudance"; // 数据库名称
-$dance_db_backup = "xjtudance_backup"; // 备份数据库名称
-$data_path = dirname($_SERVER['DOCUMENT_ROOT'])."/xjtudance-data/"; // 数据储存位置
-$config_file_path = $data_path."dance.conf"; // 设置文件路径
-?>
+	static $dance_db = "xjtudance"; // 数据库名称（在用户体验版和正式发布版中，$dance_db = "xjtudance"）
+	static $dance_db_backup = "xjtudance_backup"; // 备份数据库名称（在用户体验版和正式发布版中，$dance_db_backup = "xjtudance_backup"）
+	static $data_path = "/data/release/xjtudance-data/"; // 数据储存位置
+	static $config_file_path = "/data/release/xjtudance-data/dance.conf"; // 设置文件路径
+}
+
+?> 

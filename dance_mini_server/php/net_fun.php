@@ -17,7 +17,7 @@ Redistributions of files must retain the above copyright notice.
 * @note 该函数在每次用户联系服务器（包括登录）或发送心跳包时执行
 */
 function setUserOnline($_id, &$db) {
- 	$sec = explode(" ", microtime());	// get t value (获取当前时间)
+/*  	$sec = explode(" ", microtime());	// get t value (获取当前时间)
 	$micro = explode(".", $sec[0]);
 	date_default_timezone_set("Asia/Shanghai");
 	$time = date("YmdHis").".".substr($micro[1], 0, 3);
@@ -32,7 +32,7 @@ function setUserOnline($_id, &$db) {
 		$user_online = array_merge($user_online["user_online"], array($_id));
 		$collection_global->update(array('name' => 'dance'), array('$set' => 
 			array('user_online' => $user_online)));
-	}
+	} */
 }
 
 /**
