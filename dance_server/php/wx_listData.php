@@ -32,7 +32,7 @@ if (array_key_exists('collection_name', $data)) {
 	$arr = getData($data['collection_name'], $data['skip'], $data['limit'], $data['list_order'], $data['query'], $data['getValues'], $data['extraData']);
 
 	header('errMsg: 0');
-	echo json_encode($arr);
+	echo json_encode($arr, JSON_UNESCAPED_UNICODE);
 	//echo microtime() - $time1;
 } else {
 	header('errMsg: MISS_COLLECTION_NAME');
