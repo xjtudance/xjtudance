@@ -1,0 +1,2 @@
+<!--pages/startup/startup.wxml-->
+<image class='startup-img' src="{{startup_img}}" mode="aspectFill"/>

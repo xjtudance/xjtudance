@@ -1,0 +1,13 @@
+4233 articles saved, 2547.6178598404s passed.PHP Notice:  Undefined offset: 0 in /data/release/dance/xjtudance/test/php/bmy_fun.php on line 351
+PHP Notice:  Undefined offset: 0 in /data/release/dance/xjtudance/test/php/bmy_fun.php on line 356
+PHP Notice:  Undefined offset: 4 in /data/release/dance/xjtudance/test/php/bmy_fun.php on line 624
+PHP Notice:  Undefined offset: 3 in /data/release/dance/xjtudance/test/php/bmy_fun.php on line 625
+PHP Notice:  Undefined offset: 1 in /data/release/dance/xjtudance/test/php/bmy_fun.php on line 628
+PHP Notice:  Undefined offset: 2 in /data/release/dance/xjtudance/test/php/bmy_fun.php on line 629
+PHP Notice:  Undefined offset: 2 in /data/release/dance/xjtudance/test/php/bmy_fun.php on line 630
+PHP Notice:  Undefined offset: 1 in /data/release/dance/xjtudance/test/php/bmy_fun.php on line 632
+PHP Notice:  Undefined offset: 1 in /data/release/dance/xjtudance/test/php/bmy_fun.php on line 634
+PHP Notice:  Undefined offset: 0 in /data/release/dance/xjtudance/test/php/bmy_fun.php on line 363
+PHP Notice:  Undefined offset: 0 in /data/release/dance/xjtudance/test/php/bmy_fun.php on line 366
+4234 articles saved, 2549.5486238003s passed.
+all articles are downloaded from bmybbs dance jinghuaqu!

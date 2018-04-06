@@ -1,0 +1,125 @@
+<!--dancerPro.wxml-->
+<view class="container">
+  <view class="page-body drawer_box">
+    <!--drawer content-->
+    <view class="page-body drawer_title">{{dancer_info.nickname}}</view>
+    <view class="page-body">
+
+      <view class="page-section page-section-gap">
+        <label class="title">性别: </label>
+        <text class="content" selectable>{{dancer_info.gender}}</text>
+      </view>
+
+      <view class="page-section page-section-gap">
+        <label class="title">破蛋日: </label>
+        <text class="content" selectable>{{dancer_info.person_info.eggday}}</text>
+      </view>
+
+      <view class="page-section page-section-gap">
+        <label class="title">年级/毕业时间: </label>
+        <text class="content" selectable>{{dancer_info.person_info.grade}}</text>
+      </view>
+
+      <view class="page-section page-section-gap">
+        <label class="title">专业: </label>
+        <text class="content" selectable>{{dancer_info.person_info.major}}</text>
+      </view>
+
+      <view class="page-section page-section-gap">
+        <label class="title">身高: </label>
+        <text class="content" selectable>{{dancer_info.person_info.height}}</text>
+      </view>
+
+      <view class="page-section page-section-gap">
+        <label class="title">家乡: </label>
+        <text class="content" selectable>{{dancer_info.person_info.hometown}}</text>
+      </view>
+
+      <view class="page-section page-section-gap" wx:if="{{isBanban}}">
+        <label class="title">微信号: </label>
+        <text class="content" selectable>{{dancer_info.wechat.id}}</text>
+      </view>
+
+      <view class="page-section page-section-gap" wx:if="{{isBanban}}">
+        <label class="title">QQ号: </label>
+        <text class="content" selectable>{{dancer_info.person_info.QQ}}</text>
+      </view>
+
+      <view class="page-section page-section-gap" wx:if="{{isBanban}}">
+        <label class="title">联系方式: </label>
+        <text class="content" selectable>{{dancer_info.person_info.contact == '' ? '没有填耶' : dancer_info.person_info.contact}}</text>
+      </view>
+
+      <view class="page-section page-section-gap">
+        <label class="title">现有舞蹈水平: </label>
+        <text class="content" selectable>{{dancer_info.dance.danceLevel}}</text>
+      </view>
+
+      <view class="page-section page-section-gap" wx:if="{{isBanban}}">
+        <label class="title">你从哪里知道了dance: </label>
+        <text class="content" selectable>{{dancer_info.dance.knowdancefrom}}</text>
+      </view>
+
+      <view class="page-section page-section-gap">
+        <label class="title">再介绍一下自己啦: </label>
+        <text class="content" selectable>{{dancer_info.dance.selfIntro}}</text>
+      </view>
+
+      <view class="page-section page-section-gap">
+        <label class="title">PP: </label>
+        <image class="photo" src="{{photo}}" mode="aspectFit" data-src="{{photo}}" bindtap="previewImage"></image>
+      </view>
+    </view>
+
+    <view class="page-body">
+      <a bindtap="openReplyArea"> 给ta留言 {{item.reply.length}}</a>
+    </view>
+
+    <!-- 写回复的区域 -->
+    <view class="reply_screen" wx:if="{{showReplyArea}}">
+
+      <form report-submit bindsubmit="replyDiary" class="reply_box">
+        <view class="top"></view>
+        <view class="top grid">
+          <label class="form_title col-0">标题：</label>
+          <input class="input-title col-1" type="text" name="title" value="" placeholder="{{reply_atwho}}" />
+        </view>
+        <view class="top grid">
+          <label class="form_title col-0">内容：</label>
+          <textarea maxlength="-1" class="input-content col-1" type="text" name="content" value="" />
+        </view>
+        <view class="top .flex-wrp" style="flex-direction:row; justify-content:flex-end;">
+          <button class="form_btn_submit" form-type="submit">留言</button>
+        </view>
+      </form>
+      <view class="reply_close" bindtap="closeReplyArea">
+      </view>
+    </view>
+
+    <!-- 回复列表 -->
+    <view class="reply-area">
+      <block wx:for="{{item.reply}}" wx:key="" wx:for-index="idx" wx:for-item="reply" data-idx="{{idx}}">
+        <!-- 1.5.0后长按改为taplongpress？？？？？？？？？？？？ -->
+        <view class="reply-item" bindtap="openReplyArea" data-mama="{{item._id}}" data-father="{{reply._id}}" data-fa="{{reply.author.nickname}}">
+          <view class="reply-infoline">
+            <view class="reply-infoleft">
+              <text class="reply_author">{{reply.author.nickname}}: </text>
+              <text class="reply_author">{{reply.title}}</text>
+              <view class="avatar" wx:if="{{reply.bmyurl != ''}}">
+                <image src="{{imgUrl_formswitch2}}"></image>
+              </view>
+            </view>
+            <view class="reply-inforight">
+              <image bindtap="deleteArticle" data-id="{{item._id}}" class="reply_delete" mode="aspectFit" src="../../images/more.png"></image>
+            </view>
+          </view>
+          <text class="reply-content" aid="{{diary}}">{{reply.content}}</text>
+        </view>
+      </block>
+    </view>
+
+    <view class="page-body">
+      <button class="btn_ok" open-type="share">分享本页</button>
+    </view>
+  </view>
+</view>

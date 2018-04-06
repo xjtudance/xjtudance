@@ -1,7 +1,7 @@
 # xjtudance
 这是西安交大dance版的报名微信小程序。
 ## 效果图
-![Welcome to Dance!](/images/screenshot/welcome_to_dance.jpg "dance版微信小程序报名页")
+![Welcome to Dance!](/docs/images/welcome_to_dance.jpg "dance版微信小程序报名页")
 ## 更新日志
 ### 2017.10.06
 * 安全 增加mongo数据库每日定时自动备份 - Linlin

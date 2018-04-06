@@ -1,0 +1,85 @@
+/* dancers.wxss */
+
+.dancers-area {
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: #fafafa;
+}
+
+.btn-todances {
+  width: 210rpx;
+  margin: 20rpx 40rpx 20rpx 40rpx;
+  font: 30rpx/70rpx "microsoft yahei";
+  text-align: center;
+  border: 0px solid #e8e8ea;
+  background-color: #800080;
+  color: #FFFFFF;
+  float: right;
+}
+
+.dancer-item {
+  width: 95%;
+  background-color: rgba(0, 0, 0, 0.1);
+  margin: auto;
+  margin-top: 10rpx;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  border-radius: 10rpx;
+}
+
+.dancer-avatar {
+  width: 30%;
+  height: 140rpx;
+  margin: auto;
+}
+
+.dancer-info {
+  width: 70%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.dancer-nickname {
+  padding: 20rpx 40rpx 5rpx 0rpx;
+  font-weight: 600;
+  font-size: 35rpx;
+  color: #800080;
+  text-align: justify;
+  text-justify: distribute;
+}
+
+.dancer-intro {
+  padding: 10rpx 40rpx 20rpx 0rpx;
+  font-weight: 500;
+  font-size: 30rpx;
+  color: rgba(0, 0, 0, 0.5);
+  text-align: justify;
+  text-justify: distribute;
+}
+
+.button-container {
+  padding: 0rpx 20rpx 15rpx 0rpx;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+}
+
+.button {
+  height: 58rpx;
+  width: 30%;
+  background-color: #8A2BE2;
+  color: #FFFFFF;
+  font-size: 25rpx;
+  line-height: 58rpx;
+  text-align: center;
+  padding: 0px;
+}
+
+.button-placeholder {
+  width: 30%;
+}
