@@ -42,7 +42,7 @@ echo "<?xml version=\"1.0\" encoding=\"utf-8\"?>";
         width: 90%;
             margin-left: 5%;
     text-align: center;
-            font-size: 3rem;
+            font-size: 3.5rem;
     color: #8B008B;
         text-shadow: 0.1rem 0.1rem 0.1rem #787878;
     font-family: 'Open Sans','Helvetica Neue',Arial,'Hiragino Sans GB','Microsoft YaHei','WenQuanYi Micro Hei',sans-serif;
@@ -53,10 +53,10 @@ echo "<?xml version=\"1.0\" encoding=\"utf-8\"?>";
     margin-left: 5%;
         color: #404040;
     font-weight: 500;
-        font-size: 2.4rem;
-        line-height: 3.4rem;
+        font-size: 3.0rem;
+        line-height: 5.4rem;
         font-family: "Lucida Grande", "Lucida Sans Unicode", Helvetica, Arial, Verdana, sans-serif;
-        letter-spacing: 0.2rem;
+        letter-spacing: 0.3rem;
             text-align: justify;
  }
 
@@ -198,8 +198,8 @@ echo "<?xml version=\"1.0\" encoding=\"utf-8\"?>";
     include_once($_SERVER['DOCUMENT_ROOT']."/xjtudance/test/php/config.php");
 $url = $server_url.'xjtudance/test/php/wx_listData.php';
     $data_request = array('collection_name' => 'jinghua',
-                          'skip' => rand(0, 4224),
-                          'limit' => rand(5, 10),
+                          'skip' => rand(0, 4233),
+                          'limit' => 1,
                  'list_order' => 'update_time',
                           'query' => [],
                  'getValues' => '',
